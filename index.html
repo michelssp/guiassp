@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#1D9E75">
+<meta name="description" content="Guia Comercial de São Sebastião do Passé — Encontre negócios, promoções, vagas e eventos da sua cidade.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Guia SSP">
+<meta property="og:title" content="Guia Comercial de SSP">
+<meta property="og:description" content="Negócios, promoções, vagas e eventos de São Sebastião do Passé">
+<meta property="og:type" content="website">
+<title>Guia SSP — São Sebastião do Passé</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <!-- HEADER -->
+  <div class="header">
+    <div class="hrow1">
+      <h1><i class="ti ti-map-pin"></i> Guia SSP</h1>
+      <div class="hicons">
+        <div class="weather-pill" id="wpill"><i class="ti ti-sun"></i> <span id="wtemp">28°C</span></div>
+        <button class="pts-pill" onclick="showTab('perfil')" title="Seus pontos">⭐ <span id="pts-display">0</span></button>
+        <button onclick="openP('pnotif')" title="Notificações"><i class="ti ti-bell"></i><div class="badge-dot" id="notif-dot"></div></button>
+        <button onclick="openP('pfav')" title="Favoritos"><i class="ti ti-heart"></i></button>
+      </div>
+    </div>
+    <div class="search-bar">
+      <i class="ti ti-search"></i>
+      <input type="text" placeholder="Buscar em São Sebastião do Passé..." id="srch" oninput="doSearch()">
+    </div>
+  </div>
+
+  <!-- CATEGORY TABS -->
+  <div class="tabs" id="tabs">
+    <button class="tab-btn on" onclick="showTab('feed',this)">📰 Feed</button>
+    <button class="tab-btn" onclick="showTab('negocios',this)">🏪 Negócios</button>
+    <button class="tab-btn" onclick="showTab('promos',this)">🔥 Promoções</button>
+    <button class="tab-btn" onclick="showTab('sorteios',this)">🎰 Sorteios</button>
+    <button class="tab-btn" onclick="showTab('vagas',this)">💼 Vagas</button>
+    <button class="tab-btn" onclick="showTab('enquetes',this)">🗳️ Enquetes</button>
+    <button class="tab-btn" onclick="showTab('ranking',this)">🏆 Ranking</button>
+    <button class="tab-btn" onclick="showTab('mapa',this)">🗺️ Mapa</button>
+    <button class="tab-btn" onclick="showTab('emergencia',this)">🚨 Emergência</button>
+    <button class="tab-btn" onclick="showTab('perfil',this)">⭐ Pontos</button>
+    <button class="tab-btn" onclick="showTab('monetizacao',this)">💰 Anunciar</button>
+    <button class="tab-btn" onclick="openAdminPrompt()">🔒 Admin</button>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div id="main"></div>
+
+  <!-- FAB -->
+  <button class="fab" onclick="openP('pcad')">
+    <i class="ti ti-plus"></i> Cadastrar negócio
+  </button>
+
+  <!-- BOTTOM TAB BAR -->
+  <div class="tabbar">
+    <button class="tabb on" onclick="showTab('feed',null);setTB(this)"><i class="ti ti-home"></i><span>Início</span></button>
+    <button class="tabb" onclick="showTab('negocios',null);setTB(this)"><i class="ti ti-building-store"></i><span>Negócios</span></button>
+    <button class="tabb" onclick="showTab('sorteios',null);setTB(this)"><i class="ti ti-ticket"></i><span>Sorteios</span></button>
+    <button class="tabb" onclick="showTab('vagas',null);setTB(this)"><i class="ti ti-briefcase"></i><span>Vagas</span></button>
+    <button class="tabb" onclick="showTab('perfil',null);setTB(this)"><i class="ti ti-star"></i><span>Pontos</span></button>
+  </div>
+</div>
+
+<!-- ===== PANELS ===== -->
+
+<!-- Detail -->
+<div class="panel" id="pdetail">
+  <div class="pheader">
+    <button class="pback" onclick="closeP('pdetail')"><i class="ti ti-arrow-left"></i></button>
+    <span id="pdetail-title" style="flex:1;font-size:15px;font-weight:600"></span>
+    <button class="picon-btn" id="pdetail-fav" onclick="toggleFavDetail()" title="Favoritar"><i class="ti ti-heart"></i></button>
+    <button class="picon-btn" onclick="shareDetail()" title="Compartilhar"><i class="ti ti-share"></i></button>
+  </div>
+  <div class="pbody" id="pdetail-body"></div>
+</div>
+
+<!-- Favoritos -->
+<div class="panel" id="pfav">
+  <div class="pheader"><button class="pback" onclick="closeP('pfav')"><i class="ti ti-arrow-left"></i></button><span style="font-size:15px;font-weight:600">Meus favoritos</span></div>
+  <div class="pbody" id="pfav-body"></div>
+</div>
+
+<!-- Notificações -->
+<div class="panel" id="pnotif">
+  <div class="pheader"><button class="pback" onclick="closeP('pnotif')"><i class="ti ti-arrow-left"></i></button><span style="font-size:15px;font-weight:600">Notificações</span></div>
+  <div class="pbody" id="pnotif-body"></div>
+</div>
+
+<!-- Cadastro -->
+<div class="panel" id="pcad">
+  <div class="pheader"><button class="pback" onclick="closeP('pcad')"><i class="ti ti-arrow-left"></i></button><span style="font-size:15px;font-weight:600">Cadastrar negócio</span></div>
+  <div class="pbody">
+    <div id="cs1">
+      <p class="step-label">Etapa 1/3 — Informações básicas</p>
+      <div class="fg"><label class="flabel">Nome do negócio *</label><input type="text" id="cn" placeholder="Ex: Padaria do João"></div>
+      <div class="fg"><label class="flabel">Categoria *</label>
+        <select id="cc"><option value="">Selecione...</option>
+          <option value="restaurante">Alimentação</option>
+          <option value="farmacia">Saúde & Farmácia</option>
+          <option value="comercio">Comércio</option>
+          <option value="servico">Serviço</option>
+          <option value="educacao">Educação</option>
+        </select>
+      </div>
+      <div class="fg"><label class="flabel">Endereço *</label><input type="text" id="ce" placeholder="Rua, número, bairro"></div>
+      <button class="sbtn" onclick="cs(2)">Próximo →</button>
+    </div>
+    <div id="cs2" style="display:none">
+      <p class="step-label">Etapa 2/3 — Contato</p>
+      <div class="fg"><label class="flabel">WhatsApp *</label><input type="tel" id="cp" placeholder="(71) 9 9999-9999"></div>
+      <div class="fg"><label class="flabel">Horário *</label><input type="text" id="ch" placeholder="Seg–Sex 8:00–18:00"></div>
+      <div class="fg"><label class="flabel">Instagram (opcional)</label><input type="text" id="ci" placeholder="@seunegocio"></div>
+      <div class="two-col">
+        <button class="sbtn secondary" onclick="cs(1)">← Voltar</button>
+        <button class="sbtn" onclick="cs(3)">Próximo →</button>
+      </div>
+    </div>
+    <div id="cs3" style="display:none">
+      <p class="step-label">Etapa 3/3 — Finalizar</p>
+      <div class="fg"><label class="flabel">Responsável *</label><input type="text" id="cr" placeholder="Nome completo"></div>
+      <div class="fg"><label class="flabel">E-mail *</label><input type="email" id="cem" placeholder="email@exemplo.com"></div>
+      <div class="fg"><label class="flabel">Descrição (opcional)</label><textarea id="cd" placeholder="Fale um pouco sobre o negócio..."></textarea></div>
+      <p class="info-tip"><i class="ti ti-info-circle"></i> Analisado em até 48h antes de aparecer no guia.</p>
+      <div class="two-col">
+        <button class="sbtn secondary" onclick="cs(2)">← Voltar</button>
+        <button class="sbtn" onclick="csub()">Enviar ✓</button>
+      </div>
+    </div>
+    <div class="success-box" id="csuc">
+      <i class="ti ti-circle-check success-icon"></i>
+      <p class="success-title">Cadastro enviado!</p>
+      <p class="success-sub">Em até 48h você receberá confirmação no e-mail informado.</p>
+      <button class="sbtn" style="margin-top:14px" onclick="creset()">Cadastrar outro negócio</button>
+    </div>
+  </div>
+</div>
+
+<!-- Admin -->
+<div class="panel" id="padmin">
+  <div class="pheader"><button class="pback" onclick="closeP('padmin')"><i class="ti ti-arrow-left"></i></button><span style="font-size:15px;font-weight:600">Painel do Admin</span></div>
+  <div class="pbody" id="padmin-body"></div>
+</div>
+
+<!-- CONTRATO / ANUNCIO -->
+<div class="panel" id="pcontrato">
+  <div class="pheader">
+    <button class="pback" onclick="closeP('pcontrato')" aria-label="Voltar"><i class="ti ti-arrow-left"></i></button>
+    <span style="font-size:15px;font-weight:600">💰 Anunciar no Guia SSP</span>
+  </div>
+  <div class="pbody" id="pcontrato-body"></div>
+</div>
+
+<!-- ADMIN -->
+<div class="panel" id="padmin">
+  <div class="pheader">
+    <button class="pback" onclick="closeP('padmin')" aria-label="Voltar"><i class="ti ti-arrow-left"></i></button>
+    <span style="font-size:15px;font-weight:600">🔒 Painel do Admin</span>
+  </div>
+  <div class="pbody" id="padmin-body"></div>
+</div>
+
+<!-- PWA INSTALL PROMPT -->
+<div class="install-prompt" id="install-prompt">
+  <span style="font-size:30px">📍</span>
+  <div class="install-prompt-text">
+    <strong>Instalar Guia SSP</strong>
+    <span>Funciona offline, sem precisar de internet!</span>
+  </div>
+  <button class="install-prompt-btn" onclick="installPWA()">Instalar</button>
+  <button class="install-prompt-close" onclick="dismissInstall()" aria-label="Fechar">×</button>
+</div>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
