@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Login — Guia SSP</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f4f4f5;display:flex;flex-direction:column;align-items:center;padding:12px 8px 24px;min-height:100vh}
+.flow-nav{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;padding:8px 4px 14px;width:100%;max-width:680px}
+.fnav-btn{background:#fff;border:.5px solid #e5e7eb;border-radius:20px;padding:5px 11px;font-size:11px;cursor:pointer;font-family:inherit;color:#6b7280;white-space:nowrap;transition:all .15s}
+.fnav-btn.on{background:#1D9E75;color:#fff;border-color:#1D9E75}
+.phone{width:300px;height:580px;border-radius:36px;border:7px solid #d1d5db;overflow:hidden;position:relative;background:#fff;box-shadow:0 8px 32px rgba(0,0,0,.12)}
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;overflow:hidden;transition:transform .3s cubic-bezier(.4,0,.2,1),opacity .2s;background:#fff}
+.screen.gone{transform:translateX(100%);opacity:0;pointer-events:none}
+.screen.back{transform:translateX(-100%);opacity:0;pointer-events:none}
+.pheader{background:#1D9E75;padding:12px 14px;color:#fff;display:flex;align-items:center;gap:8px;flex-shrink:0}
+.pback{background:none;border:none;color:#fff;font-size:18px;cursor:pointer;padding:0;display:flex;line-height:1}
+.pbody{flex:1;overflow-y:auto;padding:16px 18px 24px}
+.fg{margin-bottom:11px}
+.flabel{font-size:11px;font-weight:500;color:#6b7280;margin-bottom:4px;display:block}
+.finput{width:100%;font-family:inherit;font-size:13px;padding:9px 11px;border-radius:8px;border:.5px solid #e5e7eb;background:#f9fafb;color:#111;outline:none;transition:border-color .15s}
+.finput:focus{border-color:#1D9E75}
+.iw{position:relative}.iw .finput{padding-right:36px}
+.pw-eye{position:absolute;right:9px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#6b7280;padding:0;font-size:14px;display:flex;align-items:center}
+.btn{width:100%;border:none;border-radius:9px;padding:11px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:7px;transition:opacity .15s;margin-bottom:8px}
+.btn:active{opacity:.82}.btn.loading{opacity:.65;pointer-events:none}
+.btn-green{background:#1D9E75;color:#fff}
+.btn-outline{background:#fff;border:.5px solid #d1d5db!important;color:#111}
+.btn-ghost{background:#f9fafb;color:#6b7280}
+.btn-sm{padding:7px;font-size:11px;border-radius:8px}
+.spinner{width:15px;height:15px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.div{display:flex;align-items:center;gap:8px;margin:11px 0}
+.div::before,.div::after{content:'';flex:1;height:.5px;background:#e5e7eb}
+.div span{font-size:11px;color:#6b7280;white-space:nowrap}
+.g-btn{width:100%;background:#fff;border:.5px solid #d1d5db;border-radius:9px;padding:10px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;color:#111;margin-bottom:8px}
+.otp-row{display:flex;gap:7px;justify-content:center;margin:14px 0}
+.otp-box{width:38px;height:43px;border-radius:9px;border:.5px solid #e5e7eb;background:#f9fafb;font-size:20px;font-weight:500;text-align:center;outline:none;color:#111;font-family:inherit;transition:border-color .15s}
+.otp-box:focus{border-color:#1D9E75}
+.otp-box.filled{border-color:#1D9E75;background:#E1F5EE}
+.steps{display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+.stp{display:flex;flex-direction:column;align-items:center;gap:3px}
+.stp-dot{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;transition:all .2s}
+.stp-dot.done{background:#E1F5EE;color:#0F6E56}
+.stp-dot.active{background:#1D9E75;color:#fff}
+.stp-dot.idle{background:#f3f4f6;color:#6b7280;border:.5px solid #e5e7eb}
+.stp-label{font-size:9px;color:#6b7280}
+.stp-label.active{color:#1D9E75;font-weight:500}
+.stp-line{width:18px;height:1px;background:#e5e7eb;margin-bottom:12px}
+.stp-line.done{background:#1D9E75}
+.plan{border:.5px solid #e5e7eb;border-radius:10px;padding:10px 11px;margin-bottom:7px;cursor:pointer;transition:all .15s;position:relative}
+.plan.sel{border:1.5px solid #1D9E75;background:#E1F5EE}
+.plan-pop{position:absolute;top:-1px;right:8px;background:#1D9E75;color:#fff;font-size:9px;padding:1px 7px;border-radius:0 0 6px 6px;font-weight:500}
+.info-box{border-radius:9px;padding:10px 11px;margin-bottom:10px;display:flex;gap:8px;align-items:flex-start}
+.info-box.green{background:#E1F5EE;border:.5px solid #5DCAA5}
+.info-box.gold{background:#FAEEDA;border:.5px solid #FAC775}
+.info-box.blue{background:#E6F1FB;border:.5px solid #A4C5F0}
+.phone-row{display:flex;gap:6px}
+.country-sel{width:72px;font-family:inherit;font-size:12px;padding:9px 5px;border-radius:8px;border:.5px solid #e5e7eb;background:#f9fafb;color:#111;outline:none}
+.pw-bar{height:4px;border-radius:2px;overflow:hidden;margin-top:5px;background:#f3f4f6}
+.pw-fill{height:100%;border-radius:2px;transition:width .2s,background .2s}
+.navbar{display:flex;background:#fff;border-top:.5px solid #e5e7eb;padding:5px 0 2px;flex-shrink:0}
+.nitem{flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;cursor:pointer;border:none;background:none;padding:3px}
+.nitem i{font-size:18px;color:#6b7280}
+.nitem span{font-size:9px;color:#6b7280}
+.nitem.on i,.nitem.on span{color:#1D9E75}
+.toast{position:absolute;bottom:14px;left:12px;right:12px;background:rgba(0,0,0,.82);color:#fff;border-radius:9px;padding:9px 12px;font-size:12px;text-align:center;opacity:0;transition:opacity .25s;pointer-events:none;z-index:99}
+.toast.on{opacity:1}
+</style>
+</head>
+<body>
+
+<div class="flow-nav" id="fnav">
+  <button class="fnav-btn on" onclick="go('splash')">🏠 Splash</button>
+  <button class="fnav-btn" onclick="go('choose')">👤 Quem é você?</button>
+  <button class="fnav-btn" onclick="go('visitor')">🚶 Visitante</button>
+  <button class="fnav-btn" onclick="go('visitor-otp')">🎉 Boas-vindas</button>
+  <button class="fnav-btn" onclick="go('biz-login')">🔑 Login Empresa</button>
+  <button class="fnav-btn" onclick="go('biz-reg1')">📝 Cadastro 1/3</button>
+  <button class="fnav-btn" onclick="go('biz-reg2')">🏪 Cadastro 2/3</button>
+  <button class="fnav-btn" onclick="go('biz-reg3')">💰 Cadastro 3/3</button>
+  <button class="fnav-btn" onclick="go('biz-success')">🎉 Sucesso</button>
+  <button class="fnav-btn" onclick="go('dashboard')">📊 Dashboard</button>
+</div>
+
+<div class="phone">
+
+  <!-- SPLASH -->
+  <div class="screen" id="s-splash" style="background:linear-gradient(160deg,#064433 0%,#1D9E75 55%,#5DCAA5 100%);justify-content:center;align-items:center;padding:28px 22px;text-align:center">
+    <div style="font-size:56px;margin-bottom:12px">📍</div>
+    <div style="font-size:22px;font-weight:600;color:#fff;margin-bottom:5px">Guia SSP</div>
+    <div style="font-size:12px;color:rgba(255,255,255,.75);margin-bottom:10px">São Sebastião do Passé · BA</div>
+    <div style="background:rgba(255,255,255,.12);border-radius:12px;padding:10px 14px;margin-bottom:28px">
+      <div style="font-size:11px;color:rgba(255,255,255,.8);line-height:1.5">Negócios locais, promoções,<br>vagas, sorteios e muito mais</div>
+    </div>
+    <button class="btn btn-outline" onclick="go('choose')" style="margin-bottom:8px"><i class="ti ti-user" aria-hidden="true"></i> Entrar / Cadastrar</button>
+    <button class="btn" onclick="go('choose')" style="background:rgba(255,255,255,.12);color:rgba(255,255,255,.85);border:none">Explorar sem conta</button>
+    <div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:16px">v1.0 · Guia Comercial SSP</div>
+  </div>
+
+  <!-- CHOOSE -->
+  <div class="screen gone" id="s-choose">
+    <div style="background:#1D9E75;padding:26px 18px 18px;color:#fff;text-align:center;flex-shrink:0">
+      <div style="font-size:30px;margin-bottom:7px">👋</div>
+      <div style="font-size:16px;font-weight:500;margin-bottom:3px">Bem-vindo ao Guia SSP!</div>
+      <div style="font-size:12px;opacity:.8">Como você quer acessar?</div>
+    </div>
+    <div class="pbody" style="display:flex;flex-direction:column;gap:10px;justify-content:center;flex:1">
+      <div onclick="go('visitor')" style="background:#f9fafb;border:.5px solid #e5e7eb;border-radius:12px;padding:14px;cursor:pointer;display:flex;align-items:center;gap:12px">
+        <div style="width:42px;height:42px;background:#E6F1FB;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🚶</div>
+        <div style="flex:1"><div style="font-size:13px;font-weight:500;color:#111">Sou visitante</div><div style="font-size:11px;color:#6b7280;margin-top:2px">Explorar negócios e promoções</div></div>
+        <i class="ti ti-chevron-right" style="font-size:16px;color:#6b7280" aria-hidden="true"></i>
+      </div>
+      <div onclick="go('biz-login')" style="background:#f9fafb;border:1.5px solid #1D9E75;border-radius:12px;padding:14px;cursor:pointer;display:flex;align-items:center;gap:12px;position:relative">
+        <div style="position:absolute;top:-1px;right:10px;background:#1D9E75;color:#fff;font-size:9px;padding:2px 8px;border-radius:0 0 7px 7px;font-weight:500">ANUNCIANTE</div>
+        <div style="width:42px;height:42px;background:#E1F5EE;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🏪</div>
+        <div style="flex:1"><div style="font-size:13px;font-weight:500;color:#111">Sou dono de negócio</div><div style="font-size:11px;color:#6b7280;margin-top:2px">Cadastrar empresa e anunciar</div></div>
+        <i class="ti ti-chevron-right" style="font-size:16px;color:#1D9E75" aria-hidden="true"></i>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="go('splash')">← Voltar</button>
+    </div>
+  </div>
+
+  <!-- VISITOR -->
+  <div class="screen gone" id="s-visitor">
+    <div class="pheader"><button class="pback" onclick="go('choose')"><i class="ti ti-arrow-left"></i></button><span style="font-size:14px;font-weight:500">Entrar como visitante</span></div>
+    <div class="pbody">
+      <div style="text-align:center;margin-bottom:20px">
+        <div style="width:62px;height:62px;background:#E1F5EE;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:28px">📱</div>
+        <div style="font-size:16px;font-weight:500;color:#111;margin-bottom:5px">Qual é seu número?</div>
+        <div style="font-size:12px;color:#6b7280;line-height:1.5">Só isso! Com seu número você já<br>acessa o Guia SSP e todos os benefícios.</div>
+      </div>
+      <div class="fg">
+        <label class="flabel">WhatsApp / Celular</label>
+        <div class="phone-row">
+          <select class="country-sel"><option>🇧🇷 +55</option></select>
+          <input class="finput" type="tel" id="v-phone" placeholder="(71) 9 9999-9999" style="flex:1" oninput="formatPhone(this)" maxlength="15" onkeydown="if(event.key==='Enter')registerVisitor()">
+        </div>
+      </div>
+      <div style="background:#f9fafb;border-radius:10px;padding:11px 12px;margin-bottom:14px;border:.5px solid #e5e7eb">
+        <div style="font-size:11px;font-weight:500;color:#111;margin-bottom:7px">Com seu número você acessa:</div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <div style="display:flex;align-items:center;gap:7px;font-size:11px;color:#6b7280"><i class="ti ti-tag" style="font-size:13px;color:#1D9E75" aria-hidden="true"></i> Promoções exclusivas do dia</div>
+          <div style="display:flex;align-items:center;gap:7px;font-size:11px;color:#6b7280"><i class="ti ti-ticket" style="font-size:13px;color:#7C5CBF" aria-hidden="true"></i> Participar de sorteios</div>
+          <div style="display:flex;align-items:center;gap:7px;font-size:11px;color:#6b7280"><i class="ti ti-star" style="font-size:13px;color:#EF9F27" aria-hidden="true"></i> Acumular pontos e conquistas</div>
+          <div style="display:flex;align-items:center;gap:7px;font-size:11px;color:#6b7280"><i class="ti ti-bell" style="font-size:13px;color:#185FA5" aria-hidden="true"></i> Notificações de novidades</div>
+          <div style="display:flex;align-items:center;gap:7px;font-size:11px;color:#6b7280"><i class="ti ti-briefcase" style="font-size:13px;color:#128C7E" aria-hidden="true"></i> Ver vagas de emprego</div>
+        </div>
+      </div>
+      <button class="btn btn-green" id="v-btn" onclick="registerVisitor()">
+        <i class="ti ti-arrow-right" aria-hidden="true"></i> Acessar o Guia SSP
+      </button>
+      <div style="display:flex;align-items:center;gap:5px;justify-content:center;margin-top:8px">
+        <i class="ti ti-shield-check" style="font-size:12px;color:#9ca3af" aria-hidden="true"></i>
+        <span style="font-size:10px;color:#9ca3af">Número usado só para o Guia SSP. Não compartilhamos.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- VISITOR WELCOME (after phone registration) -->
+  <div class="screen gone" id="s-visitor-otp">
+    <div style="background:linear-gradient(135deg,#1D9E75,#0d7a58);padding:28px 18px 24px;color:#fff;text-align:center;flex-shrink:0">
+      <div style="font-size:48px;margin-bottom:10px">🎉</div>
+      <div style="font-size:17px;font-weight:500;margin-bottom:4px">Bem-vindo ao Guia SSP!</div>
+      <div style="font-size:12px;opacity:.85" id="v-phone-show">Número registrado com sucesso!</div>
+    </div>
+    <div class="pbody">
+      <div style="background:#E1F5EE;border-radius:12px;padding:13px;margin-bottom:14px;border:.5px solid #5DCAA5">
+        <div style="font-size:12px;font-weight:500;color:#085041;margin-bottom:8px">🎁 Seus benefícios desbloqueados</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:#0F6E56"><i class="ti ti-circle-check" style="font-size:14px;flex-shrink:0" aria-hidden="true"></i> Acesso a promoções exclusivas</div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:#0F6E56"><i class="ti ti-circle-check" style="font-size:14px;flex-shrink:0" aria-hidden="true"></i> Participação em sorteios grátis</div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:#0F6E56"><i class="ti ti-circle-check" style="font-size:14px;flex-shrink:0" aria-hidden="true"></i> Sistema de pontos e ranking</div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:#0F6E56"><i class="ti ti-circle-check" style="font-size:14px;flex-shrink:0" aria-hidden="true"></i> Notificações de novidades</div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:#0F6E56"><i class="ti ti-circle-check" style="font-size:14px;flex-shrink:0" aria-hidden="true"></i> Vagas de emprego em SSP</div>
+        </div>
+      </div>
+      <div style="background:#FAEEDA;border-radius:10px;padding:11px 12px;margin-bottom:14px;border:.5px solid #FAC775;display:flex;gap:8px;align-items:center">
+        <div style="font-size:20px">⭐</div>
+        <div><div style="font-size:12px;font-weight:500;color:#633806">+20 pontos de boas-vindas!</div><div style="font-size:11px;color:#854F0B;margin-top:1px">Já estão na sua conta do guia</div></div>
+      </div>
+      <button class="btn btn-green" onclick="go('dashboard')" style="margin-bottom:8px">
+        <i class="ti ti-map-pin" aria-hidden="true"></i> Explorar o Guia SSP
+      </button>
+      <button class="btn btn-ghost btn-sm" onclick="go('biz-login')" style="font-size:11px;color:#6b7280">
+        Sou dono de negócio — quero anunciar →
+      </button>
+    </div>
+  </div>
+
+  <!-- BIZ LOGIN -->
+  <div class="screen gone" id="s-biz-login">
+    <div class="pheader"><button class="pback" onclick="go('choose')"><i class="ti ti-arrow-left"></i></button><span style="font-size:14px;font-weight:500">Entrar — Dono de negócio</span></div>
+    <div class="pbody">
+      <button class="g-btn" onclick="bizGoogle()">
+        <svg width="18" height="18" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.47 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+        Entrar com Google
+      </button>
+      <div class="div"><span>ou com e-mail e senha</span></div>
+      <div class="fg"><label class="flabel">E-mail</label><input class="finput" type="email" id="bl-em" placeholder="joao@meubar.com"></div>
+      <div class="fg">
+        <label class="flabel" style="display:flex;justify-content:space-between">Senha <button onclick="showToast('Link enviado! Verifique seu e-mail.')" style="background:none;border:none;color:#1D9E75;font-size:11px;cursor:pointer;font-family:inherit">Esqueci</button></label>
+        <div class="iw"><input class="finput" type="password" id="bl-pw" placeholder="••••••••"><button class="pw-eye" onclick="togglePw('bl-pw',this)"><i class="ti ti-eye"></i></button></div>
+      </div>
+      <button class="btn btn-green" id="bl-btn" onclick="doLogin()">Entrar</button>
+      <div style="text-align:center;margin-top:10px;font-size:12px;color:#6b7280">Não tem conta? <button onclick="go('biz-reg1')" style="background:none;border:none;color:#1D9E75;font-size:12px;cursor:pointer;font-family:inherit;text-decoration:underline">Cadastre-se grátis</button></div>
+    </div>
+  </div>
+
+  <!-- BIZ REG 1 -->
+  <div class="screen gone" id="s-biz-reg1">
+    <div class="pheader"><button class="pback" onclick="go('biz-login')"><i class="ti ti-arrow-left"></i></button><span style="font-size:14px;font-weight:500">Criar conta — 1/3</span></div>
+    <div class="pbody">
+      <div class="steps">
+        <div class="stp"><div class="stp-dot active">1</div><div class="stp-label active">Conta</div></div>
+        <div class="stp-line"></div>
+        <div class="stp"><div class="stp-dot idle">2</div><div class="stp-label">Empresa</div></div>
+        <div class="stp-line"></div>
+        <div class="stp"><div class="stp-dot idle">3</div><div class="stp-label">Plano</div></div>
+      </div>
+      <button class="g-btn" onclick="bizGoogle()" style="margin-bottom:8px">
+        <svg width="16" height="16" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.47 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+        Cadastrar com Google
+      </button>
+      <div class="div"><span>ou preencha os dados</span></div>
+      <div class="fg"><label class="flabel">Seu nome *</label><input class="finput" type="text" id="r1-nome" placeholder="João da Silva"></div>
+      <div class="fg"><label class="flabel">E-mail *</label><input class="finput" type="email" id="r1-em" placeholder="joao@meubar.com"></div>
+      <div class="fg">
+        <label class="flabel">Senha *</label>
+        <div class="iw"><input class="finput" type="password" id="r1-pw" placeholder="Mín. 8 caracteres" oninput="pwStr(this)"><button class="pw-eye" onclick="togglePw('r1-pw',this)"><i class="ti ti-eye"></i></button></div>
+        <div class="pw-bar" id="pw-bar" style="display:none"><div class="pw-fill" id="pw-fill" style="width:0%"></div></div>
+        <div style="font-size:10px;color:#6b7280;margin-top:2px" id="pw-lbl"></div>
+      </div>
+      <button class="btn btn-green" onclick="r1next()">Próximo →</button>
+    </div>
+  </div>
+
+  <!-- BIZ REG 2 -->
+  <div class="screen gone" id="s-biz-reg2">
+    <div class="pheader"><button class="pback" onclick="go('biz-reg1')"><i class="ti ti-arrow-left"></i></button><span style="font-size:14px;font-weight:500">Sua empresa — 2/3</span></div>
+    <div class="pbody">
+      <div class="steps">
+        <div class="stp"><div class="stp-dot done"><i class="ti ti-check" style="font-size:10px"></i></div><div class="stp-label">Conta</div></div>
+        <div class="stp-line done"></div>
+        <div class="stp"><div class="stp-dot active">2</div><div class="stp-label active">Empresa</div></div>
+        <div class="stp-line"></div>
+        <div class="stp"><div class="stp-dot idle">3</div><div class="stp-label">Plano</div></div>
+      </div>
+      <div class="fg"><label class="flabel">Nome do negócio *</label><input class="finput" type="text" id="r2-biz" placeholder="Ex: Padaria do João"></div>
+      <div class="fg"><label class="flabel">Categoria *</label>
+        <select class="finput" id="r2-cat"><option value="">Selecione...</option><option>Alimentação & Restaurante</option><option>Saúde & Farmácia</option><option>Comércio & Loja</option><option>Serviço</option><option>Educação</option></select>
+      </div>
+      <div class="fg">
+        <label class="flabel">WhatsApp *</label>
+        <div class="phone-row"><select class="country-sel"><option>🇧🇷 +55</option></select><input class="finput" type="tel" placeholder="(71) 9 9999-9999" style="flex:1" oninput="formatPhone(this)" maxlength="15"></div>
+      </div>
+      <div class="fg"><label class="flabel">Endereço *</label><input class="finput" type="text" id="r2-end" placeholder="Rua, número, bairro"></div>
+      <div class="fg"><label class="flabel">Horário</label><input class="finput" type="text" placeholder="Ex: Seg–Sex 8:00–18:00"></div>
+      <button class="btn btn-green" onclick="r2next()">Próximo →</button>
+    </div>
+  </div>
+
+  <!-- BIZ REG 3 -->
+  <div class="screen gone" id="s-biz-reg3">
+    <div class="pheader"><button class="pback" onclick="go('biz-reg2')"><i class="ti ti-arrow-left"></i></button><span style="font-size:14px;font-weight:500">Escolha seu plano — 3/3</span></div>
+    <div class="pbody">
+      <div class="steps">
+        <div class="stp"><div class="stp-dot done"><i class="ti ti-check" style="font-size:10px"></i></div><div class="stp-label">Conta</div></div>
+        <div class="stp-line done"></div>
+        <div class="stp"><div class="stp-dot done"><i class="ti ti-check" style="font-size:10px"></i></div><div class="stp-label">Empresa</div></div>
+        <div class="stp-line done"></div>
+        <div class="stp"><div class="stp-dot active">3</div><div class="stp-label active">Plano</div></div>
+      </div>
+      <div class="info-box green"><i class="ti ti-gift" style="font-size:16px;color:#0F6E56;flex-shrink:0" aria-hidden="true"></i><div style="font-size:11px;color:#085041;line-height:1.4"><strong>7 dias grátis</strong> em qualquer plano. Cancele quando quiser.</div></div>
+      <div class="plan sel" id="pl-b" onclick="selP('b')">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div><div style="font-size:13px;font-weight:500">Básico</div><div style="font-size:10px;color:#6b7280;margin-top:2px">Perfil + 2 promoções/mês</div></div>
+          <div style="font-size:16px;font-weight:500;color:#1D9E75">R$99<span style="font-size:10px;font-weight:400;color:#6b7280">/mês</span></div>
+        </div>
+      </div>
+      <div class="plan" id="pl-p" onclick="selP('p')" style="position:relative">
+        <div class="plan-pop">POPULAR</div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div><div style="font-size:13px;font-weight:500">Pro</div><div style="font-size:10px;color:#6b7280;margin-top:2px">Destaque + stories + vagas</div></div>
+          <div style="font-size:16px;font-weight:500;color:#1D9E75">R$149<span style="font-size:10px;font-weight:400;color:#6b7280">/mês</span></div>
+        </div>
+      </div>
+      <div class="plan" id="pl-pm" onclick="selP('pm')">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div><div style="font-size:13px;font-weight:500">Premium</div><div style="font-size:10px;color:#6b7280;margin-top:2px">Tudo + sorteio mensal</div></div>
+          <div style="font-size:16px;font-weight:500;color:#1D9E75">R$199<span style="font-size:10px;font-weight:400;color:#6b7280">/mês</span></div>
+        </div>
+      </div>
+      <div style="font-size:10px;color:#6b7280;margin:8px 0 10px;display:flex;align-items:center;gap:4px"><i class="ti ti-lock" style="font-size:11px;color:#1D9E75" aria-hidden="true"></i> PIX, boleto ou cartão. Sem fidelidade.</div>
+      <button class="btn btn-green" id="r3-btn" onclick="finishReg()">Criar conta e começar grátis</button>
+    </div>
+  </div>
+
+  <!-- SUCCESS -->
+  <div class="screen gone" id="s-biz-success" style="justify-content:center;align-items:center;padding:22px 20px;text-align:center">
+    <div style="font-size:54px;margin-bottom:12px">🎉</div>
+    <div style="font-size:18px;font-weight:500;color:#111;margin-bottom:5px">Conta criada!</div>
+    <div style="font-size:12px;color:#6b7280;margin-bottom:18px;line-height:1.5">Seu negócio está sendo analisado.<br>Em até 24h você será notificado.</div>
+    <div style="width:100%;background:#f9fafb;border-radius:12px;padding:13px;text-align:left;margin-bottom:12px">
+      <div style="font-size:10px;font-weight:500;color:#6b7280;text-transform:uppercase;letter-spacing:.5px;margin-bottom:9px">Próximos passos</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;gap:8px;align-items:center"><div style="width:22px;height:22px;background:#E1F5EE;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ti ti-check" style="font-size:10px;color:#0F6E56" aria-hidden="true"></i></div><span style="font-size:11px;color:#6b7280">Análise do cadastro — <strong style="color:#111">até 24h</strong></span></div>
+        <div style="display:flex;gap:8px;align-items:center"><div style="width:22px;height:22px;background:#E7F7EE;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ti ti-brand-whatsapp" style="font-size:10px;color:#128C7E" aria-hidden="true"></i></div><span style="font-size:11px;color:#6b7280">Confirmação via WhatsApp</span></div>
+        <div style="display:flex;gap:8px;align-items:center"><div style="width:22px;height:22px;background:#FAEEDA;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ti ti-star" style="font-size:10px;color:#854F0B" aria-hidden="true"></i></div><span style="font-size:11px;color:#6b7280">7 dias grátis ativados</span></div>
+      </div>
+    </div>
+    <div style="background:#E1F5EE;border-radius:10px;padding:10px;width:100%;margin-bottom:14px">
+      <div style="font-size:12px;color:#085041;font-weight:500">🎁 +50 pontos de boas-vindas!</div>
+      <div style="font-size:11px;color:#0F6E56;margin-top:2px">Use para subir no ranking do Guia SSP</div>
+    </div>
+    <button class="btn btn-green" onclick="go('dashboard')" style="width:100%">Ir para o dashboard →</button>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div class="screen gone" id="s-dashboard" style="padding:0">
+    <div style="background:#1D9E75;padding:12px 14px;color:#fff;flex-shrink:0">
+      <div style="display:flex;align-items:center;gap:9px;margin-bottom:10px">
+        <div style="width:36px;height:36px;background:rgba(255,255,255,.2);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px">🏪</div>
+        <div style="flex:1"><div style="font-size:13px;font-weight:500">Padaria do João</div><div style="display:flex;align-items:center;gap:5px;margin-top:1px"><span style="background:rgba(255,255,255,.2);color:#fff;font-size:9px;padding:1px 6px;border-radius:6px;font-weight:500">BÁSICO</span><span style="font-size:10px;opacity:.75">7 dias grátis</span></div></div>
+        <button onclick="go('biz-login')" style="background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:7px;padding:4px 8px;font-size:10px;cursor:pointer;font-family:inherit">Sair</button>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">
+        <div style="background:rgba(255,255,255,.15);border-radius:8px;padding:8px;text-align:center"><div style="font-size:17px;font-weight:500">128</div><div style="font-size:9px;opacity:.8">Visualizações</div></div>
+        <div style="background:rgba(255,255,255,.15);border-radius:8px;padding:8px;text-align:center"><div style="font-size:17px;font-weight:500">34</div><div style="font-size:9px;opacity:.8">Cliques WA</div></div>
+        <div style="background:rgba(255,255,255,.15);border-radius:8px;padding:8px;text-align:center"><div style="font-size:17px;font-weight:500">4.8★</div><div style="font-size:9px;opacity:.8">Avaliação</div></div>
+      </div>
+    </div>
+    <div style="flex:1;overflow-y:auto;padding:12px 13px">
+      <div style="font-size:10px;font-weight:500;color:#6b7280;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Ações rápidas</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:11px">
+        <div onclick="showToast('Abrindo editor de promoção...')" style="background:#fff;border:.5px solid #e5e7eb;border-radius:10px;padding:10px;cursor:pointer;text-align:center"><i class="ti ti-tag" style="font-size:20px;color:#1D9E75;display:block;margin-bottom:3px" aria-hidden="true"></i><div style="font-size:11px;font-weight:500">Nova promoção</div><div style="font-size:9px;color:#6b7280">1/2 restantes</div></div>
+        <div onclick="showToast('Abrindo editor de perfil...')" style="background:#fff;border:.5px solid #e5e7eb;border-radius:10px;padding:10px;cursor:pointer;text-align:center"><i class="ti ti-edit" style="font-size:20px;color:#185FA5;display:block;margin-bottom:3px" aria-hidden="true"></i><div style="font-size:11px;font-weight:500">Editar perfil</div><div style="font-size:9px;color:#6b7280">Completar dados</div></div>
+        <div style="background:#fff;border:.5px solid #e5e7eb;border-radius:10px;padding:10px;cursor:pointer;text-align:center;opacity:.5"><i class="ti ti-ticket" style="font-size:20px;color:#7C5CBF;display:block;margin-bottom:3px" aria-hidden="true"></i><div style="font-size:11px;font-weight:500">Sorteio</div><div style="font-size:9px;color:#6b7280">Plano Pro+</div></div>
+        <div style="background:#fff;border:.5px solid #e5e7eb;border-radius:10px;padding:10px;cursor:pointer;text-align:center;opacity:.5"><i class="ti ti-chart-bar" style="font-size:20px;color:#EF9F27;display:block;margin-bottom:3px" aria-hidden="true"></i><div style="font-size:11px;font-weight:500">Relatório</div><div style="font-size:9px;color:#6b7280">Plano Pro+</div></div>
+      </div>
+      <div class="info-box gold">
+        <i class="ti ti-star" style="font-size:16px;color:#854F0B;flex-shrink:0;margin-top:1px" aria-hidden="true"></i>
+        <div><div style="font-size:12px;font-weight:500;color:#633806;margin-bottom:2px">Teste grátis — 7 dias</div><div style="font-size:11px;color:#854F0B;line-height:1.4">Após o período, R$99/mês no plano Básico.</div><button onclick="go('biz-reg3')" style="background:#EF9F27;color:#fff;border:none;border-radius:7px;padding:5px 10px;font-size:11px;font-weight:500;cursor:pointer;font-family:inherit;margin-top:6px">Ver planos →</button></div>
+      </div>
+      <div style="background:#fff;border:.5px solid #e5e7eb;border-radius:10px;padding:11px;margin-top:8px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="font-size:12px;font-weight:500">Perfil 65% completo</span><span style="font-size:12px;color:#1D9E75;font-weight:500">65%</span></div>
+        <div style="height:5px;background:#f3f4f6;border-radius:3px;overflow:hidden;margin-bottom:5px"><div style="width:65%;height:100%;background:#1D9E75;border-radius:3px"></div></div>
+        <div style="font-size:10px;color:#6b7280">Adicione foto, horário e descrição</div>
+      </div>
+    </div>
+    <div class="navbar">
+      <button class="nitem on"><i class="ti ti-home" aria-hidden="true"></i><span>Início</span></button>
+      <button class="nitem" onclick="showToast('Seu negócio...')"><i class="ti ti-building-store" aria-hidden="true"></i><span>Negócio</span></button>
+      <button class="nitem" onclick="showToast('Promoções...')"><i class="ti ti-tag" aria-hidden="true"></i><span>Promoções</span></button>
+      <button class="nitem" onclick="showToast('Disponível no plano Pro')"><i class="ti ti-chart-bar" aria-hidden="true"></i><span>Relatório</span></button>
+      <button class="nitem" onclick="go('biz-login')"><i class="ti ti-user" aria-hidden="true"></i><span>Conta</span></button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+const S={splash:'s-splash',choose:'s-choose',visitor:'s-visitor','visitor-otp':'s-visitor-otp','biz-login':'s-biz-login','biz-reg1':'s-biz-reg1','biz-reg2':'s-biz-reg2','biz-reg3':'s-biz-reg3','biz-success':'s-biz-success',dashboard:'s-dashboard'};
+const FLOW=['splash','choose','visitor','visitor-otp','biz-login','biz-reg1','biz-reg2','biz-reg3','biz-success','dashboard'];
+let cur='splash';
+function go(id){
+  const p=document.getElementById(S[cur]),n=document.getElementById(S[id]);
+  if(!n||p===n)return;
+  p.classList.add('back');setTimeout(()=>p.classList.remove('back'),350);p.classList.add('gone');
+  n.classList.remove('gone');cur=id;
+  document.querySelectorAll('.fnav-btn').forEach((b,i)=>b.classList.toggle('on',FLOW[i]===id));
+}
+function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('on');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('on'),2500);}
+function togglePw(id,btn){const i=document.getElementById(id);i.type=i.type==='password'?'text':'password';btn.innerHTML=i.type==='password'?'<i class="ti ti-eye"></i>':'<i class="ti ti-eye-off"></i>';}
+function formatPhone(i){let v=i.value.replace(/\D/g,'');if(v.length>=11)v=v.replace(/(\d{2})(\d{5})(\d{4}).*/,'($1) $2-$3');else if(v.length>=7)v=v.replace(/(\d{2})(\d{4})(\d*)/,'($1) $2-$3');else if(v.length>=3)v=v.replace(/(\d{2})(\d*)/,'($1) $2');i.value=v;}
+function pwStr(i){const b=document.getElementById('pw-bar'),f=document.getElementById('pw-fill'),l=document.getElementById('pw-lbl');b.style.display='block';const v=i.value;let s=0;if(v.length>=8)s++;if(/[A-Z]/.test(v))s++;if(/\d/.test(v))s++;if(/[^A-Za-z0-9]/.test(v))s++;const c=['#E24B4A','#E24B4A','#EF9F27','#1D9E75','#085041'],t=['','Fraca','Razoável','Boa','Forte'];f.style.width=(s*25)+'%';f.style.background=c[s];l.textContent=t[s]||'';l.style.color=c[s]||'#E24B4A';}
+function registerVisitor(){
+  const ph=document.getElementById('v-phone').value;
+  if(!ph||ph.replace(/\D/g,'').length<10){showToast('Digite um número válido com DDD!');return;}
+  const btn=document.getElementById('v-btn');
+  btn.classList.add('loading');btn.innerHTML='<div class="spinner"></div> Registrando...';
+  // Save to localStorage as demo
+  localStorage.setItem('ssp_visitor_phone', ph);
+  setTimeout(()=>{
+    btn.classList.remove('loading');btn.innerHTML='<i class="ti ti-arrow-right"></i> Acessar o Guia SSP';
+    const el=document.getElementById('v-phone-show');
+    if(el)el.textContent='Número '+ph+' registrado! ✅';
+    go('visitor-otp');
+  },1200);
+}
+function doLogin(){const btn=document.getElementById('bl-btn');const em=document.getElementById('bl-em').value;const pw=document.getElementById('bl-pw').value;if(!em||!pw){showToast('Preencha e-mail e senha!');return;}btn.classList.add('loading');btn.innerHTML='<div class="spinner"></div> Entrando...';setTimeout(()=>{btn.classList.remove('loading');btn.innerHTML='Entrar';go('dashboard');},1800);}
+function bizGoogle(){showToast('Conectando ao Google...');setTimeout(()=>go('biz-reg2'),1200);}
+function r1next(){const n=document.getElementById('r1-nome').value;const e=document.getElementById('r1-em').value;const p=document.getElementById('r1-pw').value;if(!n||!e||!p){showToast('Preencha todos os campos!');return;}if(p.length<8){showToast('Senha precisa de 8+ caracteres!');return;}go('biz-reg2');}
+function r2next(){const b=document.getElementById('r2-biz').value;const c=document.getElementById('r2-cat').value;const e=document.getElementById('r2-end').value;if(!b||!c||!e){showToast('Preencha os campos obrigatórios!');return;}go('biz-reg3');}
+function finishReg(){const btn=document.getElementById('r3-btn');btn.classList.add('loading');btn.innerHTML='<div class="spinner"></div> Criando sua conta...';setTimeout(()=>{btn.classList.remove('loading');btn.innerHTML='Criar conta e começar grátis';go('biz-success');},2000);}
+function selP(id){['b','p','pm'].forEach(p=>{const el=document.getElementById('pl-'+p);if(el)el.classList.toggle('sel',p===id);});}
+</script>
+</body>
+</html>
